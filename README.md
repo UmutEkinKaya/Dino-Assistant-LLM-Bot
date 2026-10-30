@@ -8,7 +8,7 @@ request. Every change was measured against an evaluation set.
 Built as a learning project for production-style LLM engineering: retrieval, structured outputs, function calling,
 evaluation, and a FastAPI service with a streaming chat UI.
 
-![Chat UI](docs/screenshot.png)
+![Chat UI: the answer says what the documents cover and labels the Wikipedia part](docs/chat.png)
 
 ## What it does
 
@@ -22,6 +22,9 @@ evaluation, and a FastAPI service with a streaming chat UI.
 | **Measured** | 83-question golden set, 30-claim fact-check set, LLM-as-a-judge metrics, ablation runs, run-to-run noise analysis. |
 
 ## Architecture
+While the agent works, the chat shows its live steps (streamed from the API). A herd of pixel Ceratosaurus waits for the meteor, which hits the moment the answer arrives.
+
+![Loading scene with live agent steps](docs/loading.png)
 
 ```mermaid
 flowchart LR
