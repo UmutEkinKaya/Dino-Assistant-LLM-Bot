@@ -1,0 +1,27 @@
+# secrets
+.env
+
+# python / tooling
+__pycache__/
+*.pyc
+.pytest_cache/
+.venv/
+venv/
+.vscode/
+
+# generated at runtime (logs, reports, user files, caches)
+logs/
+reports/
+exports/
+data/index/
+data/tickets.jsonl
+data/live_cache.jsonl
+data/extract_cache.jsonl
+
+# large / third-party inputs (see README: how to rebuild)
+data/Dinozorlar.pdf
+models/
+
+# OS
+Thumbs.db
+.DS_Store

@@ -1,0 +1,30 @@
+{"id": "c01", "claim": "T. rex lived in western North America about 68-66 million years ago.", "label": "supported"}
+{"id": "c02", "claim": "Velociraptor had feathers.", "label": "supported"}
+{"id": "c03", "claim": "Birds are living dinosaurs.", "label": "supported"}
+{"id": "c04", "claim": "Triceratops ve T. rex aynı dönemde yaşadı.", "label": "supported"}
+{"id": "c05", "claim": "Megalosaurus was the first dinosaur to be scientifically named.", "label": "supported"}
+{"id": "c06", "claim": "T. rex could run at 70 km/h.", "label": "refuted"}
+{"id": "c07", "claim": "Stegosaurus and T. rex lived at the same time.", "label": "refuted"}
+{"id": "c08", "claim": "Velociraptor insan boyunda bir dinozordu.", "label": "refuted"}
+{"id": "c09", "claim": "Birds evolved from ornithischian dinosaurs.", "label": "refuted"}
+{"id": "c10", "claim": "Argentinosaurus lived in the Late Jurassic.", "label": "refuted"}
+{"id": "c11", "claim": "Large tyrannosaurs like T. rex were covered in feathers.", "label": "refuted"}
+{"id": "c12", "claim": "Antarktika'da hiç dinozor fosili bulunmadı.", "label": "refuted"}
+{"id": "c13", "claim": "Spinosaurus was a strong swimmer that hunted in open water.", "label": "disputed"}
+{"id": "c14", "claim": "Spinosaurus yüzerek avlanırdı.", "label": "disputed"}
+{"id": "c15", "claim": "Bonebeds prove that Albertosaurus lived in groups.", "label": "disputed"}
+{"id": "c16", "claim": "Triceratops was green.", "label": "not_in_document"}
+{"id": "c17", "claim": "T. rex had between 54 and 60 teeth.", "label": "supported"}
+{"id": "c18", "claim": "Ankylosaurus could live for 70 years.", "label": "not_in_document"}
+{"id": "c19", "claim": "Triceratops made loud trumpeting calls.", "label": "not_in_document"}
+{"id": "c20", "claim": "Velociraptor was about the size of a turkey.", "label": "supported"}
+{"id": "c21", "claim": "T. rex could only see moving objects.", "label": "refuted", "note": "Belge keskin, binoküler görüş diyor: iddiayı dolaylı çürütüyor (kullanıcı kararı)"}
+{"id": "c22", "claim": "Stegosaurus had a second brain in its hips.", "label": "refuted"}
+{"id": "c23", "claim": "Pterosaurs were flying dinosaurs.", "label": "refuted"}
+{"id": "c24", "claim": "Sauropods lived mostly in water to support their weight.", "label": "refuted"}
+{"id": "c25", "claim": "The Chicxulub crater is about 180 km wide.", "label": "disputed"}
+{"id": "c26", "claim": "Torosaurus is the adult form of Triceratops.", "label": "disputed"}
+{"id": "c27", "claim": "T. rex was primarily a scavenger.", "label": "refuted"}
+{"id": "c28", "claim": "Dinozorlar soğukkanlı ve yavaş hayvanlardı.", "label": "refuted"}
+{"id": "c29", "claim": "Archaeopteryx is no longer certain to be the oldest bird.", "label": "supported"}
+{"id": "c30", "claim": "Spinosaurus ve T. rex aynı dönemde yaşadı.", "label": "refuted"}

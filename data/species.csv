@@ -1,0 +1,11 @@
+name,aliases,period,start_ma,end_ma,length_m_min,length_m_max,mass_t_min,mass_t_max,diet,region,section
+Tyrannosaurus rex,T. rex|T rex|Tyrannosaurus|T-rex,Late Cretaceous,68,66,12,12,8,8,Carnivore,North America,guide:s4.1
+Velociraptor,Raptor,Late Cretaceous,75,71,2,2,0.015,0.02,Carnivore,Mongolia,guide:s4.2
+Triceratops,,Late Cretaceous,68,66,9,9,6,12,Herbivore,North America,guide:s4.3
+Brachiosaurus,,Late Jurassic,154,150,22,22,30,50,Herbivore,North America,guide:s4.4
+Stegosaurus,,Late Jurassic,155,150,9,9,5,5,Herbivore,North America,guide:s4.5
+Spinosaurus,,Mid Cretaceous,99,93,14,15,7,7,Piscivore,North Africa,guide:s4.6
+Ankylosaurus,,Late Cretaceous,68,66,6,8,5,8,Herbivore,North America,guide:s4.7
+Parasaurolophus,,Late Cretaceous,76,73,9.5,9.5,2.5,2.5,Herbivore,North America,guide:s4.8
+Argentinosaurus,,Mid Cretaceous,95,93,30,35,65,75,Herbivore,Argentina,guide:s4.9
+Troodon,,Late Cretaceous,77,77,2.4,2.4,0.05,0.05,Omnivore,North America,guide:s4.10

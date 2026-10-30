@@ -1,0 +1,6 @@
+[
+  {"path": "data/dinosaur_field_guide.pdf", "parser": "guide", "source": "guide",
+   "title": "Dinosaur Field Guide Rev 3.1"},
+  {"path": "data/Dinozorlar.pdf", "parser": "wiki_bundle", "source": "wikipedia",
+   "title": "Wikipedia derlemesi (31 makale)"}
+]

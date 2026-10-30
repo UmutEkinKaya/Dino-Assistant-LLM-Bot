@@ -1,0 +1,485 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Dino Bilgi Asistanı</title>
+<style>
+:root{--bg:#f7f6f3;--fg:#1c1917;--mut:#78716c;--card:#fff;--line:#e7e5e4;--acc:#2f6f4f;--acc2:#e8f1ec;
+  --me:#2f6f4f;--mefg:#fff;--warn:#b45309;--bad:#b91c1c;--gk:#f3f1ec;--web:#2563eb;--webbg:#e0e9ff}
+@media (prefers-color-scheme:dark){:root{--bg:#1a1917;--fg:#f2f0eb;--mut:#a8a29e;--card:#25231f;--line:#3d3a35;
+  --acc:#7fc4a0;--acc2:#24342b;--me:#2f6f4f;--mefg:#f2f0eb;--warn:#fbbf24;--bad:#f87171;--gk:#2f2c27;--web:#7aa2ff;--webbg:#1e2a4a}}
+*{box-sizing:border-box}
+html,body{height:100%}
+body{margin:0;font:15px/1.6 system-ui,-apple-system,"Segoe UI",sans-serif;background:var(--bg);color:var(--fg);
+  display:flex;flex-direction:column}
+header{border-bottom:1px solid var(--line);background:var(--bg)}
+.bar{max-width:820px;margin:0 auto;padding:12px 16px;display:flex;align-items:center;gap:10px}
+.bar h1{font-size:17px;margin:0;flex:1}.bar h1 small{display:block;font-size:12px;font-weight:400;color:var(--mut)}
+.seg{display:flex;border:1px solid var(--line);border-radius:18px;overflow:hidden}
+.seg button,.ghost{white-space:nowrap}
+.seg button{border:0;background:transparent;color:var(--mut);padding:5px 12px;font:inherit;font-size:13px;cursor:pointer}
+.seg button.on{background:var(--acc);color:#fff}
+.ghost{border:1px solid var(--line);background:transparent;color:var(--fg);border-radius:18px;padding:5px 12px;font:inherit;font-size:13px;cursor:pointer}
+main{flex:1;overflow-y:auto}
+#thread{max-width:820px;margin:0 auto;padding:20px 16px 8px}
+.empty{text-align:center;color:var(--mut);padding:40px 0 10px}.empty .big{font-size:40px}
+.ex{display:flex;flex-wrap:wrap;gap:6px;justify-content:center;margin-top:14px}
+.ex button{border:1px dashed var(--line);background:transparent;color:var(--mut);border-radius:14px;padding:4px 11px;font-size:13px;cursor:pointer}
+.ex button:hover{color:var(--fg);border-color:var(--mut)}
+.msg{display:flex;margin:10px 0}.msg.me{justify-content:flex-end}
+.bubble{max-width:88%;border-radius:16px;padding:10px 14px}
+.me .bubble{background:var(--me);color:var(--mefg);border-bottom-right-radius:4px;white-space:pre-wrap}
+.bot .bubble{background:var(--card);border:1px solid var(--line);border-bottom-left-radius:4px}
+.tag{display:inline-block;font-size:11.5px;border-radius:10px;padding:0 8px;border:1px solid currentColor;margin:6px 6px 0 0}
+.tag.warn{color:var(--warn)}.tag.web{color:var(--web)}.tag.bad{color:var(--bad)}.tag.ok{color:var(--acc)}
+a.file{display:flex;flex-direction:column;margin:10px 0 2px;padding:9px 12px;border:1px solid var(--acc);border-radius:10px;
+  color:var(--acc);text-decoration:none;font-weight:600;background:var(--acc2);width:fit-content;max-width:100%}
+a.file small{font-weight:400;color:var(--mut);font-size:11.5px;word-break:break-all}
+a.file:hover{filter:brightness(1.05)}
+details.more{margin-top:8px;font-size:14px}
+details.more>summary{cursor:pointer;color:var(--mut);font-size:13px;list-style:none;user-select:none}
+details.more>summary::before{content:"▸";display:inline-block;margin-right:6px;transition:transform .15s}
+details.more[open]>summary::before{transform:rotate(90deg)}
+.inner{border-top:1px dashed var(--line);margin-top:8px;padding-top:4px}
+.sec{margin-top:10px}.st{font-size:11px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:var(--mut);margin-bottom:2px}
+.item{margin:3px 0}
+.src{font-family:ui-monospace,Consolas,monospace;font-size:11px;color:var(--acc);background:var(--acc2);border-radius:5px;padding:0 5px;margin-left:4px;white-space:nowrap;text-decoration:none}
+a.src:hover{text-decoration:underline}.src.web{color:var(--web);background:var(--webbg)}
+.lnk{text-decoration:none;margin-left:6px;font-size:13px}
+.gk{background:var(--gk);border-radius:6px;padding:4px 8px}
+.docsays{border-left:3px solid var(--acc);padding:2px 10px;color:var(--mut)}
+.warn{color:var(--warn)}.bad{color:var(--bad)}
+.mono{font-family:ui-monospace,Consolas,monospace;font-size:11.5px;white-space:pre-wrap;word-break:break-word;color:var(--mut)}
+.meta{color:var(--mut);font-size:12px;margin-top:10px}
+.bubble.loading{width:min(460px,82vw);padding:6px 8px}
+.impact canvas{display:block;width:100%;height:84px;image-rendering:pixelated}
+.step{font-size:12.5px;color:var(--mut);padding:4px 4px 2px;min-height:1.6em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.step::before{content:"› ";color:var(--acc)}
+.step.in{animation:stepin .25s ease-out}
+@keyframes stepin{from{opacity:0;transform:translateY(3px)}to{opacity:1;transform:none}}
+.tl{display:grid;grid-template-columns:auto 1fr;gap:1px 10px;font-size:12.5px}
+.tl .d{font-family:ui-monospace,Consolas,monospace;color:var(--mut);text-align:right;font-variant-numeric:tabular-nums}
+.tl .tlbar{height:4px;border-radius:2px;background:var(--acc);opacity:.55;margin-top:2px}
+.dots span{display:inline-block;width:6px;height:6px;margin-right:4px;border-radius:50%;background:var(--mut);animation:b 1s infinite}
+.dots span:nth-child(2){animation-delay:.15s}.dots span:nth-child(3){animation-delay:.3s}
+@keyframes b{0%,80%,100%{opacity:.25}40%{opacity:1}}
+/* ---- Gökyüzü şeridi: pixel dinozor + meteor + çarpmadan bu yana sayaç ---- */
+.sky{position:relative;height:72px;border-bottom:1px solid var(--line);overflow:hidden;
+  background:linear-gradient(#e9f1ea,#f7f6f3)}
+@media (prefers-color-scheme:dark){.sky{background:linear-gradient(#141c19,#1a1917)}}
+.sky canvas{position:absolute;inset:0;width:100%;height:100%;image-rendering:pixelated}
+.sky-in{position:relative;max-width:820px;height:100%;margin:0 auto;pointer-events:none}
+.clock{position:absolute;right:16px;top:8px;text-align:right;pointer-events:auto;padding:3px 8px;border-radius:8px;
+  background:color-mix(in srgb,var(--bg) 70%,transparent);line-height:1.25}
+.clock .l{font-size:11px;color:var(--mut);letter-spacing:.02em}
+.clock .n{font:600 17px/1.2 ui-monospace,Consolas,monospace;color:var(--fg);font-variant-numeric:tabular-nums}
+.clock .s{font-size:10.5px;color:var(--mut)}.clock .s a{color:var(--acc)}
+@media (max-width:560px){.clock .n{font-size:14px}.clock .s{display:none}}
+footer{border-top:1px solid var(--line);background:var(--bg)}
+form{max-width:820px;margin:0 auto;padding:12px 16px 16px;display:flex;gap:8px}
+textarea{flex:1;min-height:46px;max-height:160px;resize:none;padding:11px 13px;border:1px solid var(--line);border-radius:12px;
+  background:var(--card);color:var(--fg);font:inherit}
+textarea:focus{outline:2px solid var(--acc);outline-offset:-1px}
+button.go{background:var(--acc);color:#fff;border:0;border-radius:12px;padding:0 18px;font:inherit;font-weight:600;cursor:pointer}
+button.go:disabled{opacity:.5;cursor:wait}
+@media (max-width:560px){.bar{flex-wrap:wrap;gap:8px}.bar h1{flex-basis:100%;font-size:16px}.bar h1 small{display:none}.bubble{max-width:96%}}
+</style>
+</head>
+<body>
+<header><div class="bar">
+  <h1>🦖 Dino Bilgi Asistanı<small>31 Wikipedia makalesi + saha rehberi · eksik kalan canlı Wikipedia'dan</small></h1>
+  <div class="seg" id="seg"><button class="on" data-mode="ask">Sohbet</button><button data-mode="check">İddia doğrula</button></div>
+  <button class="ghost" id="reset" title="Geçmişi sil, yeni konuşma başlat">Yeni sohbet</button>
+</div></header>
+
+<div class="sky" id="sky"><canvas id="cv" aria-hidden="true"></canvas><div class="sky-in">
+  <div class="clock" title="Renne ve ark. (2013): çarpma 66,043 ± 0,011 milyon yıl önce. Belirsizlik ±11 bin yıl; yani son haneler semboliktir, ama sayaç her saniye gerçekten bir artar.">
+    <div class="l">☄️ Meteor çarpmasından bu yana</div>
+    <div class="n" id="clock">…</div>
+    <div class="s">saniye · 66,043 ± 0,011 milyon yıl · <a href="/pdf/Dinozorlar.pdf#page=718" target="_blank">kaynak s.718</a></div>
+  </div></div></div>
+
+<main id="scroll"><div id="thread"></div></main>
+
+<footer><form id="f">
+  <textarea id="t" rows="1" placeholder="Bir şey sor… (Enter gönderir, Shift+Enter yeni satır)"></textarea>
+  <button class="go" id="b">Gönder</button>
+</form></footer>
+
+<script>
+const EX = {
+  ask: ["Was Ceratosaurus bigger than Allosaurus?", "Velociraptor gerçekten filmlerdeki kadar büyük müydü?",
+        "Ceratopsidae ailesindeki dinozorları dönemleri ve yıllarıyla Excel tablosu yap", "T. rex'in dudakları var mıydı? Cevabı Word dosyası yap"],
+  check: ["T. rex saatte 70 km koşardı.", "Spinosaurus ve T. rex aynı dönemde yaşadı.", "Birds are living dinosaurs."]
+};
+const MAX_TURNS = 6;               // sunucuya giden geçmiş (son N tur); bağlamı ve maliyeti sınırlar
+let mode = "ask", history = [], busy = false;
+const newId = () => (crypto.randomUUID ? crypto.randomUUID() : String(Date.now()) + Math.random()).replace(/[^A-Za-z0-9]/g, "").slice(0, 32);
+let sessionId = newId();          // sunucu bu sohbetin cevaplarını hatırlar (dosyaya dökmek için)
+const $ = s => document.querySelector(s);
+const esc = s => String(s ?? "").replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+
+// ---------- kaynak etiketleri: belge → PDF sayfası, web/ref → gerçek URL ----------
+const srcs = (arr, meta) => (arr || []).map(s => {
+  const m = meta[s];
+  if (m && m.url) return `<a class="src web" href="${esc(m.url)}" target="_blank" title="${esc(m.section)}">🌐 ${esc(s)}</a>`;
+  if (!m || !m.file) return `<span class="src">${esc(s)}</span>`;
+  const href = `/pdf/${encodeURIComponent(m.file)}` + (m.page ? `#page=${m.page}` : "");
+  return `<a class="src" href="${href}" target="_blank" title="${esc(m.doc + " › " + m.section)}">${esc(s)}${m.page ? " · s." + m.page : ""}</a>`;
+}).join("");
+const gk = arr => (arr || []).map(g => {
+  const text = typeof g === "string" ? g : g.text, q = typeof g === "string" ? "" : g.search_query;
+  const link = q ? `<a class="lnk" href="https://en.wikipedia.org/w/index.php?search=${encodeURIComponent(q)}" target="_blank" title="Wikipedia'da doğrula">🔗</a>` : "";
+  return `<div class="item gk">${esc(text)}${link}</div>`;
+}).join("");
+const sec = (title, html) => html ? `<div class="sec"><div class="st">${title}</div>${html}</div>` : "";
+const list = (arr, cls = "") => (arr || []).map(x => `<div class="item ${cls}">${esc(x)}</div>`).join("");
+const claims = (arr, meta) => (arr || []).map(c => `<div class="item">${esc(c.text)}${srcs(c.sources, meta)}</div>`).join("");
+const usage = u => u ? `<div class="meta">${u.calls} LLM çağrısı · ${(u.latency_ms / 1000).toFixed(1)} sn · $${u.usd.toFixed(4)}</div>` : "";
+
+// Süre dağılımı: her adımın süresi = bir sonraki adımın başlangıcı − bu adımın başlangıcı.
+function timeline(r) {
+  const tl = r.timeline || [], total = (r.usage?.latency_ms || 0) / 1000;
+  if (!tl.length) return "";
+  const rows = tl.map((x, i) => ({text: x.text, d: Math.max(0, (i + 1 < tl.length ? tl[i + 1].t : total) - x.t)}));
+  const max = Math.max(...rows.map(x => x.d), 0.01);
+  return `<div class="tl">${rows.map(x => `<span class="d">${x.d.toFixed(1)} sn</span>
+    <span>${esc(x.text)}<div class="tlbar" style="width:${Math.max(2, 100 * x.d / max)}%"></div></span>`).join("")}
+    <span class="d"><b>${total.toFixed(1)} sn</b></span><span><b>Toplam</b></span></div>`;
+}
+
+// ---------- cevap: önde sadece özet, gerisi "Kaynaklar ve detaylar" altında ----------
+function renderAsk(r) {
+  const a = r.answer, meta = r.sources || {}, web = (a.web_facts || []).length;
+  const tags = [
+    a.coverage && a.coverage !== "full" ? `<span class="tag warn">belge kapsamı: ${a.coverage}</span>` : "",
+    web ? `<span class="tag web">🌐 eksik kısım Wikipedia'dan</span>` : "",
+    (r.tickets_opened || []).length ? `<span class="tag warn">eksik bilgi kaydı açıldı</span>` : "",
+    r.cached ? `<span class="tag ok">⚡ önbellekten</span>` : ""].join("");
+  const trace = (r.trace || []).map(t => `${t.step}. ${t.tool}(${JSON.stringify(t.args)})`).join("\n");
+  const n = (a.document || []).length + (a.inference || []).length + web;
+  const icon = {pdf: "📕", docx: "📘", xlsx: "📗"}, label = {pdf: "PDF", docx: "Word", xlsx: "Excel"};
+  const file = (r.files || []).map(f => `<a class="file" href="${esc(f.url)}" download>${icon[f.format]} ${label[f.format]} dosyasını indir
+      <small>${f.turns} ${f.kind === "table" ? "satır" : "cevap"} · ${esc(f.name)}</small></a>`).join("");
+  return `<div>${esc(a.summary)}</div>${file}${tags}
+    <details class="more"><summary>Kaynaklar ve detaylar${n ? ` (${n})` : ""}</summary><div class="inner">
+      ${r.standalone_question ? sec("Anlaşılan soru", `<div class="item mono">${esc(r.standalone_question)}</div>`) : ""}
+      ${a.document_says ? sec("Belgelerde", `<div class="item docsays">${esc(a.document_says)}</div>`) : ""}
+      ${sec("Düzeltme", list(a.corrections, "warn"))}
+      ${sec("Belgede yazanlar", claims(a.document, meta))}
+      ${sec("Çıkarım", claims(a.inference, meta))}
+      ${sec("Canlı kaynaklar (belge dışı)", claims(a.web_facts, meta))}
+      ${sec("Tartışmalı", list(a.debated))}
+      ${sec("Belgede olmayanlar", list(a.not_in_document))}
+      ${sec("Genel bilgi (belge dışı, 🔗 ile doğrula)", gk(a.general_knowledge))}
+      ${sec("Süre dağılımı", timeline(r))}
+      ${sec("Araç adımları", trace ? `<div class="mono">${esc(trace)}</div>` : "")}
+      ${sec("Kod kontrolü uyarıları", list(r.warnings, "warn"))}
+      ${usage(r.usage)}
+    </div></details>`;
+}
+
+function renderCheck(r) {
+  const v = r.result;
+  const cls = {supported: "ok", refuted: "bad", disputed: "warn", not_in_document: "warn"}[v.verdict];
+  const label = {supported: "Doğru", refuted: "Yanlış", disputed: "Tartışmalı", not_in_document: "Belgede yok"}[v.verdict];
+  const ev = (v.evidence || []).map(e => `<div class="item">${e.verified ? "✓" : "✗"} “${esc(e.quote)}” <span class="mono">(${esc(e.stance)})</span>${srcs([e.source], {})}</div>`).join("");
+  return `<span class="tag ${cls}">${label}</span><div style="margin-top:6px">${esc(v.explanation)}</div>
+    ${v.correction ? `<div class="item" style="margin-top:6px"><b>Doğrusu:</b> ${esc(v.correction)}</div>` : ""}
+    ${!r.reliable ? `<div class="item warn">Karar doğrulanmış bir alıntıyla desteklenmiyor, elle kontrol edin.</div>` : ""}
+    <details class="more"><summary>Kanıtlar (${(v.evidence || []).length})</summary><div class="inner">
+      ${sec("✓ = alıntı kaynakta birebir bulundu", ev)}${usage(r.usage)}</div></details>`;
+}
+
+// ---------- sohbet akışı ----------
+function bubble(who, html) {
+  const d = document.createElement("div");
+  d.className = "msg " + who;
+  d.innerHTML = `<div class="bubble">${html}</div>`;
+  $("#thread").appendChild(d);
+  $("#scroll").scrollTop = $("#scroll").scrollHeight;
+  return d.firstChild;
+}
+function showEmpty() {
+  $("#thread").innerHTML = `<div class="empty"><div class="big">🦖</div>
+    ${mode === "ask" ? "Dinozorlar hakkında sor; takip soruları da sorabilirsin.<br>İstersen cevapları PDF, Word ya da Excel dosyası yaparım." : "Bir iddia yaz, belgelere göre doğrulayayım."}
+    <div class="ex">${EX[mode].map(e => `<button type="button">${esc(e)}</button>`).join("")}</div></div>`;
+  $("#thread").querySelectorAll(".ex button").forEach(b => b.onclick = () => { $("#t").value = b.textContent; send(); });
+}
+function grow() { const t = $("#t"); t.style.height = "auto"; t.style.height = Math.min(t.scrollHeight, 160) + "px"; }
+
+// /ask/stream: her satır bir JSON. "step" satırları bekleme kutusundaki adımı günceller, sonda "result" gelir.
+async function askStream(body, onStep) {
+  const res = await fetch("/ask/stream", {method: "POST", headers: {"Content-Type": "application/json"}, body: JSON.stringify(body)});
+  if (!res.ok) return {ok: false, status: res.status, data: await res.json()};
+  const reader = res.body.getReader(), dec = new TextDecoder();
+  let buf = "", out = {ok: false, status: 500, data: {detail: "Cevap tamamlanmadı"}};
+  for (;;) {
+    const {value, done} = await reader.read();
+    if (done) break;
+    buf += dec.decode(value, {stream: true});
+    let i;
+    while ((i = buf.indexOf("\n")) >= 0) {
+      const line = buf.slice(0, i).trim(); buf = buf.slice(i + 1);
+      if (!line) continue;
+      const ev = JSON.parse(line);
+      if (ev.type === "step") onStep(ev.text);
+      else if (ev.type === "result") out = {ok: true, status: 200, data: ev.data};
+      else if (ev.type === "error") out = {ok: false, status: ev.status, data: ev};
+    }
+  }
+  return out;
+}
+
+async function send() {
+  const q = $("#t").value.trim();
+  if (!q || busy) return;
+  busy = true; $("#b").disabled = true;
+  $(".empty")?.remove();
+  bubble("me", esc(q));
+  $("#t").value = ""; grow();
+  // Bekleme kutusu: sürü gelir, göğe bakar; cevap gelince meteor çarpar, sonra cevap belirir.
+  const box = bubble("bot", (PX.reduce ? `<span class="dots"><span></span><span></span><span></span></span>`
+                                       : `<div class="impact"><canvas aria-hidden="true"></canvas></div>`)
+                            + `<div class="step" aria-live="polite">Soru gönderildi</div>`);
+  const stepEl = box.querySelector(".step");
+  const setStep = text => { stepEl.textContent = text; stepEl.classList.remove("in"); void stepEl.offsetWidth; stepEl.classList.add("in"); };
+  if (!PX.reduce) box.classList.add("loading");
+  const scene = impactScene(box.querySelector("canvas"));
+  let html;
+  try {
+    const body = mode === "ask" ? {question: q, history: history.slice(-MAX_TURNS), session_id: sessionId, debug: true} : {claim: q};
+    if (mode === "check") setStep("Belgelerde kanıt aranıyor");
+    const {ok, status, data} = mode === "ask" ? await askStream(body, setStep)
+      : await fetch("/check", {method: "POST", headers: {"Content-Type": "application/json"}, body: JSON.stringify(body)})
+          .then(async r => ({ok: r.ok, status: r.status, data: await r.json()}));
+    if (!ok) {
+      const msg = data.detail?.[0]?.msg || data.detail || data.error || "Bilinmeyen hata";
+      html = `<span class="bad">Hata (${status}): ${esc(msg)}</span>`;
+    } else if (mode === "ask") {
+      html = renderAsk(data);
+      if (!(data.files || []).length || (data.tools_used || []).some(t => t !== "export_document"))
+        history.push({question: q, answer: data.answer.summary.slice(0, 2000)});
+    } else {
+      html = renderCheck(data);
+    }
+  } catch (err) {
+    html = `<span class="bad">Servise ulaşılamadı: ${esc(err)}</span>`;
+  }
+  await scene.finish();                                 // çarpma animasyonu biter
+  scene.stop();
+  box.classList.remove("loading");
+  box.innerHTML = html;
+  $("#scroll").scrollTop = $("#scroll").scrollHeight;
+  busy = false; $("#b").disabled = false; $("#t").focus();
+}
+
+document.querySelectorAll("#seg button").forEach(b => b.onclick = () => {
+  document.querySelectorAll("#seg button").forEach(x => x.classList.toggle("on", x === b));
+  mode = b.dataset.mode;
+  $("#t").placeholder = mode === "ask" ? "Bir şey sor… (Enter gönderir, Shift+Enter yeni satır)" : "Bir iddia yaz… (Enter gönderir)";
+  if (!$("#thread").querySelector(".msg")) showEmpty();
+});
+$("#reset").onclick = () => { history = []; sessionId = newId(); showEmpty(); $("#t").focus(); };
+$("#t").addEventListener("input", grow);
+$("#t").addEventListener("keydown", e => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); send(); } });
+$("#f").onsubmit = e => { e.preventDefault(); send(); };
+showEmpty();
+</script>
+<script>
+// ===================== Pixel sahneler (sprite'lar bu projeye özgü) =====================
+// Karakterler: o = gövde, e = göz, b = sırt plakası (osteoderm).
+const PX = (() => {
+  const darkQ = matchMedia("(prefers-color-scheme: dark)");
+  const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const P = 3;                                          // bir oyun pikseli = 3 css pikseli
+  const S = {
+    SAURO: ["...............ooo", "..............ooeo", "..............oo..", ".............oo...",
+            "............oo....", "......ooooooooo...", "....ooooooooooo...", "ooooooooooooooo...",
+            "......ooooooooo..."],
+    SAURO_LEGS: [[".......oo...oo....", ".......oo...oo...."], ["........oo.oo.....", "........oo.oo....."]],
+    CERA: [".............o..", "...........oooo.", "..........ooeooo", "..........ooo...",
+           ".......bbooo....", "...bbbooooo.....", "oooooooooooo.o..", "......oooooo....", ".......oooo....."],
+    CERA_UP: ["............oo..", "...........ooo.o", "..........ooeoo.", "..........ooo...",   // baş göğe dönük
+              ".......bbooo....", "...bbbooooo.....", "oooooooooooo.o..", "......oooooo....", ".......oooo....."],
+    CERA_LEGS: [[".......oo.oo....", ".......o...o....", "......oo...oo..."],
+                ["........ooo.....", "........o.o.....", ".......oo.oo...."]],
+    FERN: ["o.o.o", ".ooo.", "..o.."],
+    BONE: ["o...o", ".ooo.", "o...o"]};
+  const pal = () => darkQ.matches
+    ? {sauro: "#7fc4a0", cera: "#d4a373", plate: "#f0c98b", eye: "#1a1917", ground: "#4a4640", pebble: "#3d3a35",
+       fern: "#3f6f55", star: "#6b665f", rock: "#b45309", bone: "#e7e5e4",
+       trail: ["#fde68a", "#fbbf24", "#f59e0b", "#ea580c", "#9a3412"], boom: ["#fef3c7", "#fb923c", "#ef4444"]}
+    : {sauro: "#3f7d55", cera: "#9a6b3f", plate: "#5c3b1e", eye: "#f7f6f3", ground: "#c9c4bd", pebble: "#ddd8d2",
+       fern: "#8fbf9c", star: "#c9c4bd", rock: "#78350f", bone: "#a8a29e",
+       trail: ["#fde68a", "#fbbf24", "#f59e0b", "#ea580c", "#c2410c"], boom: ["#fde68a", "#fb923c", "#dc2626"]};
+
+  function surface(cv, onResize) {
+    const g = cv.getContext("2d"), s = {g, GW: 0, GH: 0, W: 0, H: 0};
+    const fit = () => {
+      const dpr = devicePixelRatio || 1;
+      s.W = cv.clientWidth; s.H = cv.clientHeight;
+      cv.width = s.W * dpr; cv.height = s.H * dpr;
+      g.setTransform(dpr, 0, 0, dpr, 0, 0); g.imageSmoothingEnabled = false;
+      s.GW = Math.floor(s.W / P); s.GH = Math.floor(s.H / P);
+      if (onResize) onResize(s);
+    };
+    s.px = (x, y, c) => { g.fillStyle = c; g.fillRect(Math.round(x) * P, Math.round(y) * P, P, P); };
+    s.sprite = (rows, gx, gy, colors, flip) => rows.forEach((r, y) => [...r].forEach((ch, x) => {
+      if (ch !== "." && colors[ch]) s.px(flip ? gx + r.length - 1 - x : gx + x, gy + y, colors[ch]);
+    }));
+    s.ground = c => {
+      const gy = s.GH - 3;
+      for (let x = 0; x < s.GW; x++) { s.px(x, gy, c.ground); if ((x * 7) % 11 === 0) s.px(x, gy + 1, c.pebble); }
+      return gy;
+    };
+    s.clear = () => g.clearRect(0, 0, s.W, s.H);
+    s.ro = new ResizeObserver(fit); s.ro.observe(cv); fit();
+    return s;
+  }
+  function animate(step) {                              // step(dt); sekme gizliyken durur
+    let last = performance.now(), alive = true;
+    const f = t => {
+      if (!alive) return;
+      const dt = Math.min(0.05, (t - last) / 1000); last = t;
+      if (!document.hidden) step(dt);
+      requestAnimationFrame(f);
+    };
+    requestAnimationFrame(f);
+    return () => { alive = false; };
+  }
+  return {P, S, pal, surface, animate, reduce, darkQ};
+})();
+
+// ---- Üst şerit: sauropod serbestçe dolaşır, ara sıra uzakta yıldız kayar ----
+(() => {
+  const S = PX.S, st = {x: 6, dir: 1, frame: 0, ft: 0, shoot: null, shootT: 5};
+  let ferns = [];
+  const s = PX.surface(document.getElementById("cv"), sf => {
+    const n = Math.max(3, Math.floor(sf.GW / 45));
+    ferns = Array.from({length: n}, (_, i) => Math.floor((i + 0.5) * sf.GW / n) + (i % 2 ? 7 : -5));
+    if (PX.reduce) draw(0);
+  });
+  function draw(dt) {
+    const c = PX.pal();
+    s.clear();
+    const gy = s.ground(c);
+    ferns.forEach(fx => s.sprite(S.FERN, fx, gy - 3, {o: c.fern}, false));
+    st.shootT -= dt;
+    if (st.shootT <= 0 && !st.shoot) st.shoot = {x: s.GW * (0.3 + Math.random() * 0.5), y: 2 + Math.random() * 4};
+    if (st.shoot) {
+      st.shoot.x -= 40 * dt; st.shoot.y += 6 * dt;
+      for (let i = 0; i < 4; i++) s.px(st.shoot.x + i, st.shoot.y - i * 0.15, c.star);
+      if (st.shoot.x < s.GW * 0.1) { st.shoot = null; st.shootT = 8 + Math.random() * 8; }
+    }
+    const dw = S.SAURO[0].length;
+    st.x += st.dir * 3.5 * dt;
+    if (st.x > s.GW - dw - 2) st.dir = -1;
+    if (st.x < 2) st.dir = 1;
+    st.ft += dt; if (st.ft > 0.28) { st.ft = 0; st.frame ^= 1; }
+    const top = gy - S.SAURO.length - 2, flip = st.dir < 0, col = {o: c.sauro, e: c.eye};
+    s.sprite(S.SAURO, st.x, top, col, flip);
+    s.sprite(S.SAURO_LEGS[PX.reduce ? 0 : st.frame], st.x, top + S.SAURO.length, col, flip);
+  }
+  if (!PX.reduce) PX.animate(draw);
+  PX.darkQ.addEventListener("change", () => PX.reduce && draw(0));
+
+  // Sayaç: çarpma = J2000'den 66,043 milyon (Jülyen) yıl önce. Saniyeler tam sayı olarak güvenli aralıkta (2,1e15 < 2^53).
+  const YEAR = 31557600, J2000 = Date.UTC(2000, 0, 1, 12), BASE = 66043000 * YEAR;
+  const el = document.getElementById("clock");
+  const tick = () => { el.textContent = Math.floor(BASE + (Date.now() - J2000) / 1000).toLocaleString("tr-TR"); };
+  tick(); setInterval(tick, 1000);
+})();
+
+// ---- Bekleme sahnesi: sürü gelir ve göğe bakar; cevap gelince meteor çarpar ----
+function impactScene(cv) {
+  if (PX.reduce || !cv) return {finish: () => Promise.resolve(), stop() {}};
+  const S = PX.S, s = PX.surface(cv);
+  const herd = [0, 1, 2].map(i => ({i, x: -16 - i * 7, tx: 0, state: "in", frame: 0, ft: 0, phase: Math.random() * 6}));
+  const met = {x: 0, y: 2, ready: false};
+  let t = 0, phase = "wait", fall = null, boom = null, done = null, debris = [];
+
+  const stop = PX.animate(dt => {
+    t += dt;
+    const c = PX.pal();
+    s.clear();
+    const gy = s.ground(c);
+    if (!met.ready && s.GW) {
+      herd.forEach(h => { h.tx = Math.round(s.GW * 0.2) + h.i * 15; });
+      met.x = Math.min(s.GW - 6, herd[1].tx + 8 + 34); met.y = 1; met.ready = true;   // sürünün sağ üstü
+    }
+    if (phase !== "boom") herd.forEach(h => {          // sürü: gelir, durur, başını göğe kaldırır
+      h.ft += dt;
+      if (h.state === "in") {
+        h.x += 34 * dt;
+        if (h.ft > 0.1) { h.ft = 0; h.frame ^= 1; }
+        if (h.x >= h.tx) { h.x = h.tx; h.state = "look"; h.frame = 0; }
+      }
+      const hop = h.state === "look" && Math.sin(t * 4 + h.phase) > 0.92 ? -1 : 0;
+      const top = gy - S.CERA.length - 3 + hop;
+      s.sprite(h.state === "look" ? S.CERA_UP : S.CERA, h.x, top, {o: c.cera, e: c.eye, b: c.plate}, false);
+      s.sprite(S.CERA_LEGS[h.frame], h.x, top + S.CERA.length, {o: c.cera}, false);
+    });
+
+    if (phase === "wait") {                            // uzakta, yavaşça yaklaşan, parlayan meteor
+      met.x -= 0.5 * dt; met.y = Math.min(4, met.y + 0.25 * dt);   // çok yavaş yaklaşır: gerilim
+      [[2, -1], [3, -2], [4, -3], [5, -4]].forEach(([dx, dy], k) => s.px(met.x + dx, met.y + dy, c.trail[k + 1]));
+      for (let i = 0; i <= 1; i++) for (let j = 0; j <= 1; j++) s.px(met.x + i, met.y + j, c.rock);
+      s.px(met.x - 1, met.y - 1, Math.sin(t * 7) > 0 ? c.trail[0] : c.trail[1]);
+    } else if (phase === "fall") {                     // cevap geldi: meteor hızlanıp sürüye iner
+      fall.t += dt;
+      const k = Math.min(1, fall.t / 0.45), e = k * k;
+      const x = fall.x0 + (fall.x1 - fall.x0) * e, y = fall.y0 + (fall.y1 - fall.y0) * e;
+      const len = Math.hypot(fall.x1 - fall.x0, fall.y1 - fall.y0) || 1;
+      const ux = (fall.x1 - fall.x0) / len, uy = (fall.y1 - fall.y0) / len;
+      for (let q = 1; q <= 16; q++) {
+        const col = c.trail[Math.min(4, Math.floor(q / 3))], tx = x - ux * q, ty = y - uy * q;
+        s.px(tx, ty, col); s.px(tx + 1, ty, col);
+        if (q < 8) { s.px(tx, ty + 1, col); s.px(tx - 1, ty, col); }
+      }
+      for (let i = -1; i <= 1; i++) for (let j = -1; j <= 1; j++) s.px(x + i, y + j, c.rock);
+      if (k >= 1) {
+        phase = "boom"; boom = {x: fall.x1, y: gy - 1, t: 0};
+        const cols = [c.cera, c.plate, c.boom[1], c.boom[2], c.rock];
+        debris = Array.from({length: 34}, (_, i) => ({x: boom.x + (Math.random() - 0.5) * 34, y: gy - 3 - Math.random() * 8,
+          vx: (Math.random() - 0.5) * 50, vy: -18 - Math.random() * 26, c: cols[i % cols.length]}));
+      }
+    } else if (phase === "boom") {                     // flaş, şok dalgası, savrulan parçalar, fosiller
+      boom.t += dt;
+      if (boom.t < 0.14) {
+        s.g.globalAlpha = 0.75 * (1 - boom.t / 0.14); s.g.fillStyle = c.boom[0];
+        s.g.fillRect(0, 0, s.W, s.H); s.g.globalAlpha = 1;
+      }
+      [[70, 0], [42, 1]].forEach(([sp, ci]) => {
+        const r = boom.t * sp;
+        for (let a = 0; a < 22; a++) {
+          const ang = Math.PI + (a / 21) * Math.PI;
+          s.px(boom.x + Math.cos(ang) * r, boom.y + Math.sin(ang) * r * 0.55, c.boom[Math.min(2, ci + Math.floor(boom.t * 3))]);
+        }
+      });
+      debris.forEach(d => {
+        d.vy += 70 * dt; d.x += d.vx * dt; d.y = Math.min(gy - 1, d.y + d.vy * dt);
+        s.px(d.x, d.y, d.c);
+      });
+      if (boom.t > 0.25) herd.forEach(h => s.sprite(S.BONE, h.x + 5, gy - 3, {o: c.bone}, false));
+      if (boom.t >= 0.8 && done) { const d = done; done = null; d(); }
+    }
+  });
+
+  return {
+    finish() {
+      return new Promise(res => {
+        if (phase !== "wait") return res();
+        const cx = herd.reduce((a, h) => a + h.x, 0) / herd.length + 8;
+        fall = {t: 0, x0: met.x, y0: met.y, x1: cx, y1: s.GH - 3 - 6};
+        phase = "fall"; done = res;
+        setTimeout(() => { if (done) { const d = done; done = null; d(); } }, 2000);   // sekme gizliyse de cevap gelsin
+      });
+    },
+    stop() { stop(); s.ro.disconnect(); }
+  };
+}
+</script>
+</body>
+</html>
